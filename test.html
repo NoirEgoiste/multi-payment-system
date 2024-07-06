@@ -1,0 +1,244 @@
+<style>
+.t706__body_cartwinshowed {
+height: auto;
+min-height: auto;
+overflow: auto;
+}
+
+.t706__cartwin {
+display: block;
+position: static;
+background: #fff;
+overflow: unset;
+opacity: 1 !important;
+}
+
+.t706__cartwin-content {
+position: relative;
+max-width: 1200px;
+height: 100%;
+padding: 40px 20px;
+margin: 0 auto;
+background: #fff;
+overflow: unset;
+}
+
+@media (min-width: 960px) {
+.t706__cartwin-content {
+display: -webkit-box;
+display: -ms-flexbox;
+display: flex;
+}
+}
+
+@media (min-width: 960px) {
+.t706__orderform {
+max-width: 40%;
+width: 100%;
+margin-left: auto;
+}
+}
+
+.t706__cartwin-close,
+.t706__carticon {
+display: none;
+}
+
+
+@media (min-width: 960px) {
+.products-fixed-list {
+position: -webkit-sticky;
+position: sticky;
+-ms-flex-item-align: start;
+align-self: flex-start;
+top: 20px;
+max-width: 50%;
+width: 100%;
+}
+}
+
+.t706__form-upper-text {
+padding-top: 0;
+}
+
+.body {
+ overflow: auto !important;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+setTimeout(function() {
+t_onFuncLoad('tcart__openCart', function() {
+tcart__openCart();
+});
+}, 1000);
+$('.t706__cartwin-top, .t706__cartwin-products, .t706__cartwin-bottom').wrapAll('<div class="products-fixed-list"></div>');
+$('.t706__orderform').append($('.t706__form-bottom-text'));
+$('.t706__orderform').prepend($('.t706__form-upper-text'));
+});
+</script>
+
+
+<style>
+#wind2 {
+       position: absolute;
+    width:50%;
+    height: 100px;
+    left: 10%;
+      top: 0px;
+    border:solid #62c584 4px;
+  display: none;
+     z-index: 999999;
+    overflow: hidden;
+    background-color:#fff;
+    color:#000;
+    text-align:center;
+    padding:10px;
+}
+</style>
+
+
+<script>
+  window.myAfterSendedFunction = function (form) {
+    if (!form) return;
+    if (form instanceof jQuery) {
+      form = form.get(0);
+    }
+
+    /* номер заявки (Lead ID) */
+    var leadId = form.tildaTranId;
+    var orderId = form.tildaOrderId;
+
+    //console.log (orderId);
+
+  //  console.log(window.tcart.total);
+
+    /* все поля заявки */
+
+
+    console.log(form.elements);
+
+        prodListArrI=[];
+
+    var obj = {};
+    var inputs = form.elements;
+    Array.prototype.forEach.call(inputs, function (input) {
+      obj[input.name] = input.value;
+      prodListArrI.push(input.value);
+
+    });
+
+    //console.log(prodListArrI);
+
+     prodListArrT=[];
+ prodListArr=[];
+    for (let i = 0; i < window.tcart.products.length ; i++) {
+        let prodListObj={};
+        prodListObj['name'] = window.tcart.products[i]['name'];
+        prodListObj['price'] = window.tcart.products[i]['price'];
+        prodListObj['quantity'] = window.tcart.products[i]['quantity'];
+        prodListArr.push(prodListObj);
+    };
+    prTotal = 0;
+
+
+    //console.log($(this).find('input_7661244879701').val());
+
+
+
+    for (let i = 0; i < prodListArr.length ; i++) {
+
+        prodListArrT.push("{'name': '"+ prodListArr[i].name + "', 'quantity': '" + prodListArr[i].quantity + "', 'price': '" + prodListArr[i].price + "'}");
+
+    };
+
+
+    //console.log("{"+prodListArrT.join(",")+"}");
+
+
+     document.getElementById("wind2").style.display = "block";
+
+
+     if (prodListArr.length>0) {
+     req = "{'external_id': '"+ orderId +"', 'amount': '" + window.tcart.prodamount + "', 'customer': {'given_names': '" + document.getElementById('input_7661244879700').value + "','email': '" + document.getElementById('input_7661244879701').value + "','mobile_number': '" + document.getElementById('input_7661244879702').value + "'}, 'customer_notification_preference': {'invoice_paid': ['email']}, 'items': [" + prodListArrT.join(",") +"]}";
+
+   console.log(req);
+
+
+       $.ajax({
+             type: 'POST',
+             url: 'https://qbrix.pythonanywhere.com/xendit2',
+             data: {
+                 "data": req
+
+             },
+             success: function(response){
+                 //document.getElementById('opl2').innerHTML = "<a href='" + response + "'>Оплатить заказ</a>";
+                 console.log(response);
+                   document.getElementById('opl2').innerHTML = "Для завершения оплаты пройдите по ссылке: <a href='" + response + "'>оплатить заказ</a>";
+             }	,
+             error: function(err) { // Данные не отправлены
+             document.getElementById('opl2').innerHTML = "ошибка отправки данных";
+              //document.getElementById('opl2').innerHTML = "Ошибка отправки данных";
+             console.log("err");
+
+             }
+});
+
+     }else  document.getElementById('opl2').innerHTML = "нет товаров для оплаты";
+
+     //console.log("'external_id': '"+new Date().toLocaleString()+"', 'amount': '" + chPrice + "', 'customer': {'given_names': '" + document.getElementById('cust-nam').value + "','email': '" + document.getElementById('cust-mai').value + "','mobile_number': '" + document.getElementById('cust-pho').value + "'}, 'customer_notification_preference': {'invoice_paid': ['email']}, 'items': [" + prodListArrT.join(",") +"]");
+
+
+    /* здесь нужно написать код отправки данных в нужное место, например в свой скрипт или добавление данных в cookie */
+  };
+
+  if (document.readyState !== 'loading') {
+    us_eventFromCartToPayment();
+  } else {
+    document.addEventListener('DOMContentLoaded', us_eventFromCartToPayment);
+  }
+
+  function us_eventFromCartToPayment() {
+    var forms = document.querySelectorAll('.js-form-proccess');
+    Array.prototype.forEach.call(forms, function (form) {
+      form.addEventListener('tildaform:aftersuccess', function () {
+        window.myAfterSendedFunction(form);
+      });
+    });
+  }
+</script>
+
+<div id="wind2">Оплата<br><br>
+
+<span id="opl2">формируется ссылка оплаты..</span>
+
+<br><br><button type="button" value="закрыть" onclick="document.getElementById('wind2').style.display='none'; return false;">закрыть</button>
+
+
+    </div>
+
+
+
+<script>
+
+    $('.tilt_img').each(function(){
+        $(this).attr('data-tilt', '');
+    })
+
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js'></script>
+
+<style>
+.t706__orderform { display: none !important; }
+</style>
+<script>
+$( document ).ready(function() {
+
+
+
+  $('.t706__cartwin-bottom').prepend('<a href="/payments2">Оформление</a>');
+
+  });
+  </script>
