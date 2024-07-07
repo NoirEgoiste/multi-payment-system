@@ -1,5 +1,7 @@
 import logging
+
 import httpx
+import uvicorn
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import RedirectResponse
@@ -7,7 +9,7 @@ from fastapi.responses import RedirectResponse
 app = FastAPI()
 
 XENDIT_API_URL = "https://api.xendit.co/v2/invoices"
-XENDIT_API_KEY = "xnd_development_rgDDrsF8K3Jf5uOQ3ZKY8Zn4hfbXvmTsws9IgiLAG24Xu3KUZzXXzZ2h6qG23DT"
+XENDIT_API_KEY = "xnd_production_CBNycGDaIwvBDBSdfvqa8gWqE0IStCEjfYEFFBOiY0AMN6XzHUWdQIExr1CkWl"
 
 
 @app.post("/payment")
@@ -41,3 +43,6 @@ async def handle_webhook(request: Request):
 
     return RedirectResponse(url=redirect, status_code=302)
 
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
