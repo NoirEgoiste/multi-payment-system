@@ -1,15 +1,17 @@
 import logging
+import os
 
+import dotenv
 import httpx
-import uvicorn
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
+dotenv.load_dotenv()
 XENDIT_API_URL = "https://api.xendit.co/v2/invoices"
-XENDIT_API_KEY = "xnd_production_CBNycGDaIwvBDBSdfvqa8gWqE0IStCEjfYEFFBOiY0AMN6XzHUWdQIExr1CkWl"
+XENDIT_API_KEY = os.getenv("XENDIT_API_KEY")
 
 
 @app.post("/payment")
