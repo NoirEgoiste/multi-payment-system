@@ -1,17 +1,13 @@
 # Используем официальный базовый образ Python
-FROM python:3.12
-
-# Устанавливаем зависимости
-RUN pip install --upgrade pip
+FROM python:3.12-slim as base
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем requirements.txt в контейнер
+# Устанавливаем зависимости
 COPY requirements.txt .
-
-# Устанавливаем зависимости приложения
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
 
 # Копируем исходный код приложения в контейнер
 COPY . .
